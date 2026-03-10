@@ -183,7 +183,7 @@ function toolHtml(origin) {
     outline:none;
   }
   select{color-scheme:dark}
-  select option{background:#0b1020;color:#eef2ff}
+  select option{background:#fff;color:#111}
   select optgroup{background:#0b1020;color:#eef2ff}
   input::placeholder,textarea::placeholder{color:rgba(238,242,255,.45)}
   textarea{min-height:130px;resize:vertical}
