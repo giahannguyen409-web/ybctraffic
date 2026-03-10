@@ -118,7 +118,6 @@ function jsPayload({ allowedDomains, waitTime, keyPrefix, logoUrl }) {
 }
 
 function toolHtml(origin) {
-  // Tool UI chạy ở /tool. Admin key do bạn nhập tay (không hardcode).
   return `<!doctype html>
 <html lang="vi">
 <head>
@@ -126,99 +125,271 @@ function toolHtml(origin) {
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>YBC Traffic Tool</title>
 <style>
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:24px;color:#111;}
-  .card{max-width:860px;margin:0 auto;border:1px solid #eee;border-radius:14px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.06);}
-  h1{font-size:20px;margin:0 0 12px;}
-  .row{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0;}
-  label{font-size:12px;color:#333;display:block;margin-bottom:6px;}
-  input,select,button,textarea{font:inherit}
-  input,select,textarea{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:10px;outline:none}
-  textarea{min-height:120px}
-  .col{flex:1;min-width:240px}
-  .btn{background:#0080FF;color:#fff;border:none;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700}
+  :root{
+    --bg:#0b1020;
+    --card:rgba(255,255,255,.06);
+    --card2:rgba(255,255,255,.08);
+    --text:#eef2ff;
+    --muted:rgba(238,242,255,.7);
+    --line:rgba(255,255,255,.12);
+    --blue:#3b82f6;
+    --green:#22c55e;
+    --red:#ef4444;
+    --shadow:0 20px 60px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:28px;
+    font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    color:var(--text);
+    background:
+      radial-gradient(1000px 500px at 20% -10%, rgba(59,130,246,.35), transparent 60%),
+      radial-gradient(900px 500px at 90% 10%, rgba(34,197,94,.22), transparent 60%),
+      var(--bg);
+  }
+  .wrap{max-width:980px;margin:0 auto}
+  .top{
+    display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  h1{font-size:20px;margin:0}
+  .sub{color:var(--muted);font-size:12px;line-height:1.4;margin-top:6px}
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 10px;border:1px solid var(--line);
+    border-radius:999px;background:rgba(255,255,255,.05);
+    color:var(--muted);font-size:12px;
+  }
+  .grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:900px){ .grid{grid-template-columns: 1.1fr .9fr} }
+  .card{
+    border:1px solid var(--line);
+    background:linear-gradient(180deg,var(--card),rgba(255,255,255,.03));
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:16px;
+  }
+  .title{font-weight:800;font-size:13px;margin:0 0 12px;color:rgba(238,242,255,.9)}
+  .row{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:700px){ .row{grid-template-columns:1fr 1fr} }
+  label{display:block;font-size:12px;color:var(--muted);margin:2px 0 6px}
+  input,select,textarea{
+    width:100%;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.04);
+    color:var(--text);
+    padding:10px 12px;border-radius:12px;
+    outline:none;
+  }
+  input::placeholder,textarea::placeholder{color:rgba(238,242,255,.45)}
+  textarea{min-height:130px;resize:vertical}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .btn{
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.06);
+    color:var(--text);
+    padding:10px 12px;border-radius:12px;
+    cursor:pointer;font-weight:800;font-size:13px;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn.primary{background:linear-gradient(180deg,rgba(59,130,246,.95),rgba(37,99,235,.95)); border-color:rgba(59,130,246,.55)}
+  .btn.success{background:linear-gradient(180deg,rgba(34,197,94,.95),rgba(22,163,74,.95)); border-color:rgba(34,197,94,.55)}
   .btn:disabled{opacity:.55;cursor:not-allowed}
-  .muted{color:#666;font-size:12px}
-  .ok{color:#0a7a2f;font-weight:700}
-  .err{color:#b00020;font-weight:700}
-  code{background:#f6f6f6;padding:2px 6px;border-radius:8px}
+  .hint{color:var(--muted);font-size:12px;margin-top:10px;line-height:1.5}
+  .outbox{
+    border:1px dashed rgba(255,255,255,.22);
+    background:rgba(255,255,255,.03);
+    border-radius:14px;padding:12px;margin-top:10px;
+  }
+  .kv{
+    display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px
+  }
+  .kv .item{border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:14px;padding:12px}
+  .kv .k{font-size:12px;color:var(--muted);margin-bottom:6px}
+  .kv .v{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+    font-size:12.5px;word-break:break-all;line-height:1.5
+  }
+  .toast{
+    position:fixed;right:16px;bottom:16px;
+    background:rgba(0,0,0,.75);
+    border:1px solid rgba(255,255,255,.18);
+    color:var(--text);
+    padding:10px 12px;border-radius:12px;
+    font-size:12px;display:none;max-width:320px
+  }
+  .ok{color:var(--green);font-weight:800}
+  .err{color:var(--red);font-weight:800}
 </style>
 </head>
 <body>
-  <div class="card">
-    <h1>YBC Traffic Tool</h1>
-    <div class="muted">Tạo mã cho khách mới: nhập <b>domain</b> + chọn <b>seconds</b> (60/90/150/180/300). Link cũ vẫn dùng bình thường.</div>
-
-    <div class="row">
-      <div class="col">
-        <label>ADMIN_KEY (Bearer)</label>
-        <input id="adminKey" type="password" placeholder="Nhập ADMIN_KEY để tạo mã" />
-        <div class="muted">Không chia sẻ key này cho khách.</div>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>YBC Traffic Tool</h1>
+        <div class="sub">Tạo code theo đơn hàng: nhập <b>domain</b> + chọn <b>seconds</b> (60/90/150/180/300) → nhận <b>Script URL</b> và <b>Embed</b>. Khách cũ dùng link cũ vì config lưu KV.</div>
       </div>
-      <div class="col">
-        <label>Domain khách</label>
-        <input id="domain" placeholder="vd: onepunchmantruyen.com" />
-      </div>
-      <div class="col">
-        <label>Seconds</label>
-        <select id="seconds">
-          <option value="60">60</option>
-          <option value="90">90</option>
-          <option value="150">150</option>
-          <option value="180">180</option>
-          <option value="300">300</option>
-        </select>
-      </div>
+      <div class="badge">Endpoint: <span style="font-family:ui-monospace">/admin/create</span> • Tool: <span style="font-family:ui-monospace">/tool</span></div>
     </div>
 
-    <div class="row">
-      <div class="col">
-        <label>Logo URL (tuỳ chọn)</label>
-        <input id="logoUrl" placeholder="Mặc định: https://i.ibb.co/m50mvdpH/logo.png" />
-      </div>
-      <div class="col">
-        <label>Key Prefix (tuỳ chọn)</label>
-        <input id="keyPrefix" placeholder='Mặc định: YBC-' />
-      </div>
-    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="title">Tạo code</div>
 
-    <div class="row">
-      <button class="btn" id="btnCreate">TẠO CODE</button>
-      <span id="status" class="muted"></span>
-    </div>
+        <div class="row">
+          <div>
+            <label>ADMIN_KEY (Bearer)</label>
+            <input id="adminKey" type="password" placeholder="Nhập ADMIN_KEY để tạo mã" />
+          </div>
+          <div>
+            <label>Domain khách</label>
+            <input id="domain" placeholder="vd: thamtuconan.net" />
+          </div>
+        </div>
 
-    <div class="row">
-      <div class="col">
-        <label>Kết quả</label>
-        <textarea id="out" readonly placeholder="Sẽ hiện code + scriptUrl + embed ở đây"></textarea>
-        <div class="muted">Dòng embed gửi cho khách: <code>&lt;script src="...">&lt;/script></code></div>
+        <div class="row">
+          <div>
+            <label>Seconds</label>
+            <select id="seconds">
+              <option value="60">60</option>
+              <option value="90" selected>90</option>
+              <option value="150">150</option>
+              <option value="180">180</option>
+              <option value="300">300</option>
+            </select>
+          </div>
+          <div>
+            <label>Logo URL (tuỳ chọn)</label>
+            <input id="logoUrl" placeholder="Mặc định: https://i.ibb.co/m50mvdpH/logo.png" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Key Prefix (tuỳ chọn)</label>
+            <input id="keyPrefix" placeholder="Mặc định: YBC-" />
+          </div>
+          <div>
+            <label>Trạng thái</label>
+            <input id="status" readonly value="Sẵn sàng" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" id="btnCreate">TẠO CODE</button>
+          <button class="btn" id="btnClear">XÓA KẾT QUẢ</button>
+        </div>
+
+        <div class="hint">
+          • Script chỉ chạy đúng domain đã đăng ký và chỉ hiện box khi <b>document.referrer</b> có <b>google.</b><br>
+          • Mở trực tiếp <b>/a/code.js</b> có thể bị 403 là bình thường (thiếu Referer).
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="title">Kết quả</div>
+
+        <div class="kv">
+          <div class="item">
+            <div class="k">Code</div>
+            <div class="v" id="vCode">—</div>
+          </div>
+
+          <div class="item">
+            <div class="k">Script URL (copy gửi kỹ thuật)</div>
+            <div class="v" id="vScript">—</div>
+            <div class="actions">
+              <button class="btn success" id="copyScript" disabled>COPY URL</button>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="k">Embed (copy gửi khách)</div>
+            <div class="v" id="vEmbed">—</div>
+            <div class="actions">
+              <button class="btn success" id="copyEmbed" disabled>COPY EMBED</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="outbox">
+          <div class="k" style="color:var(--muted);font-size:12px;margin-bottom:6px">JSON response</div>
+          <textarea id="out" readonly placeholder="JSON sẽ hiển thị ở đây"></textarea>
+        </div>
       </div>
     </div>
   </div>
 
+  <div class="toast" id="toast"></div>
+
 <script>
 (function(){
   const $ = (id)=>document.getElementById(id);
-  const statusEl = $("status");
-  const out = $("out");
+  const toast = $("toast");
 
-  // lưu adminKey tạm trong session tab (tuỳ bạn)
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.style.display="block";
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(()=>toast.style.display="none", 1800);
+  }
+
+  function setStatus(text, type){
+    $("status").value = text;
+    $("status").style.borderColor = type==="err" ? "rgba(239,68,68,.55)" : type==="ok" ? "rgba(34,197,94,.55)" : "rgba(255,255,255,.12)";
+  }
+
   const saved = sessionStorage.getItem("YBC_ADMIN_KEY");
   if(saved) $("adminKey").value = saved;
 
-  function setStatus(msg, cls){
-    statusEl.className = cls || "muted";
-    statusEl.textContent = msg || "";
+  function setResult(data){
+    const code = data && data.code ? data.code : "";
+    const scriptUrl = data && data.scriptUrl ? data.scriptUrl : "";
+    const embed = data && data.embed ? data.embed : "";
+
+    $("vCode").textContent = code || "—";
+    $("vScript").textContent = scriptUrl || "—";
+    $("vEmbed").textContent = embed || "—";
+
+    $("copyScript").disabled = !scriptUrl;
+    $("copyEmbed").disabled = !embed;
+
+    $("out").value = data ? JSON.stringify(data, null, 2) : "";
   }
 
-  $("btnCreate").onclick = async function(){
+  async function copyText(text){
+    try{
+      await navigator.clipboard.writeText(text);
+      showToast("Đã copy!");
+    }catch{
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = text; document.body.appendChild(ta);
+      ta.select(); document.execCommand("copy");
+      ta.remove();
+      showToast("Đã copy!");
+    }
+  }
+
+  $("copyScript").onclick = ()=>copyText($("vScript").textContent);
+  $("copyEmbed").onclick = ()=>copyText($("vEmbed").textContent);
+
+  $("btnClear").onclick = ()=>{
+    setResult(null);
+    setStatus("Sẵn sàng", "");
+    showToast("Đã xóa kết quả");
+  };
+
+  $("btnCreate").onclick = async ()=>{
     const adminKey = $("adminKey").value.trim();
     const domain = $("domain").value.trim();
     const seconds = Number($("seconds").value);
     const logoUrl = $("logoUrl").value.trim();
     const keyPrefix = $("keyPrefix").value.trim();
 
-    if(!adminKey){ setStatus("Thiếu ADMIN_KEY", "err"); return; }
-    if(!domain){ setStatus("Thiếu domain", "err"); return; }
+    if(!adminKey){ setStatus("Thiếu ADMIN_KEY", "err"); showToast("Thiếu ADMIN_KEY"); return; }
+    if(!domain){ setStatus("Thiếu domain", "err"); showToast("Thiếu domain"); return; }
 
     sessionStorage.setItem("YBC_ADMIN_KEY", adminKey);
 
@@ -227,8 +398,8 @@ function toolHtml(origin) {
     if(keyPrefix) payload.keyPrefix = keyPrefix;
 
     $("btnCreate").disabled = true;
-    setStatus("Đang tạo...", "muted");
-    out.value = "";
+    setStatus("Đang tạo...", "");
+    setResult(null);
 
     try{
       const res = await fetch("${origin}/admin/create", {
@@ -241,16 +412,20 @@ function toolHtml(origin) {
       });
 
       const data = await res.json().catch(()=>null);
+
       if(!res.ok){
         setStatus("Lỗi: " + (data && data.error ? data.error : res.status), "err");
-        out.value = JSON.stringify(data, null, 2);
+        $("out").value = data ? JSON.stringify(data, null, 2) : "";
+        showToast("Tạo thất bại");
         return;
       }
 
-      setStatus("OK! Tạo thành công", "ok");
-      out.value = JSON.stringify(data, null, 2) + "\\n\\nEMBED:\\n" + data.embed;
+      setStatus("OK - Tạo thành công", "ok");
+      setResult(data);
+      showToast("Tạo thành công");
     }catch(e){
-      setStatus("Lỗi mạng / CORS: " + e.message, "err");
+      setStatus("Lỗi mạng: " + e.message, "err");
+      showToast("Lỗi mạng");
     }finally{
       $("btnCreate").disabled = false;
     }
