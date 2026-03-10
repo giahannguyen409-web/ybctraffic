@@ -182,6 +182,9 @@ function toolHtml(origin) {
     padding:10px 12px;border-radius:12px;
     outline:none;
   }
+  select{color-scheme:dark}
+  select option{background:#0b1020;color:#eef2ff}
+  select optgroup{background:#0b1020;color:#eef2ff}
   input::placeholder,textarea::placeholder{color:rgba(238,242,255,.45)}
   textarea{min-height:130px;resize:vertical}
   .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
