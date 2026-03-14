@@ -1,3 +1,7 @@
 name = "ybctraffic"
 main = "src/index.js"
 compatibility_date = "2026-03-10"
+
+[[kv_namespaces]]
+binding = "YBC_KV"
+id = "cb176a88cabe44df9c9ca5f25d393b66"
