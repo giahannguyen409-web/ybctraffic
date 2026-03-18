@@ -231,7 +231,7 @@ function toolHtml(origin) {
     <div class="top">
       <div>
         <h1>YBC Traffic Tool</h1>
-        <div class="sub">Tạo code theo đơn hàng: nhập <b>domain</b> + chọn <b>seconds</b> (60/90/150/180/300) → nhận <b>Script URL</b> và <b>Embed</b>. Khách cũ dùng link cũ vì config lưu KV.</div>
+        <div class="sub">Tạo code theo đơn hàng: nhập <b>domain</b> + chọn <b>seconds</b> (60/90/120/150/180/300) → nhận <b>Script URL</b> và <b>Embed</b>. Khách cũ dùng link cũ vì config lưu KV.</div>
       </div>
       <div class="badge">Endpoint: <span style="font-family:ui-monospace">/admin/create</span> • Tool: <span style="font-family:ui-monospace">/tool</span></div>
     </div>
@@ -257,6 +257,7 @@ function toolHtml(origin) {
             <select id="seconds">
               <option value="60">60</option>
               <option value="90" selected>90</option>
+              <option value="120">120</option>
               <option value="150">150</option>
               <option value="180">180</option>
               <option value="300">300</option>
@@ -466,10 +467,10 @@ export default {
 
       const domain = normalizeDomain(body.domain);
       const seconds = Number(body.seconds);
-      const allowedSeconds = [60, 90, 150, 180, 300];
+      const allowedSeconds = [60, 90, 120, 150, 180, 300];
 
       if (!isValidDomain(domain)) return bad(400, "Invalid domain");
-      if (!allowedSeconds.includes(seconds)) return bad(400, "seconds must be one of 60,90,150,180,300");
+      if (!allowedSeconds.includes(seconds)) return bad(400, "seconds must be one of 60,90,120,150,180,300");
 
       const logoUrl = (body.logoUrl || "https://i.ibb.co/m50mvdpH/logo.png").trim();
       const keyPrefix = (body.keyPrefix || "YBC-").trim();
